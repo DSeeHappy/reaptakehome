@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/AuthProvider"
+import LoadingSpinner from "@/components/LoadingSpinner"
 
 export default function SignIn() {
   const [email, setEmail] = useState("")
@@ -86,9 +87,16 @@ export default function SignIn() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
+              className="group relative w-full flex justify-center items-center space-x-2 py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? (
+                <>
+                  <LoadingSpinner size="sm" text="" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                "Sign in"
+              )}
             </button>
           </div>
         </form>

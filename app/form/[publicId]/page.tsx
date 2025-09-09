@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation"
 import { useEffect, useState, useCallback } from "react"
+import LoadingSpinner from "@/components/LoadingSpinner"
 
 interface Field {
   id: string
@@ -115,8 +116,8 @@ export default function PublicForm() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-black">Loading form...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner size="lg" text="Loading form..." />
       </div>
     )
   }

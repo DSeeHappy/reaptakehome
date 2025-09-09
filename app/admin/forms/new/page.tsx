@@ -3,6 +3,7 @@
 import { useAuth } from "@/components/AuthProvider"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import LoadingSpinner from "@/components/LoadingSpinner"
 import { v4 as uuidv4 } from "uuid"
 
 interface Field {
@@ -196,8 +197,8 @@ export default function NewForm() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-black">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner size="lg" text="Loading form builder..." />
       </div>
     )
   }
@@ -437,9 +438,16 @@ export default function NewForm() {
             <button
               type="submit"
               disabled={isLoading || formData.sections.length === 0}
-              className="bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2"
             >
-              {isLoading ? "Creating..." : "Create Form"}
+              {isLoading ? (
+                <>
+                  <LoadingSpinner size="sm" text="" />
+                  <span>Creating...</span>
+                </>
+              ) : (
+                "Create Form"
+              )}
             </button>
           </div>
         </form>

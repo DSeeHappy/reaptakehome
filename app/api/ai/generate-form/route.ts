@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     // Try Responses API first (preferred)
     try {
       const completion = await openai.responses.create({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-5',
         input: buildPrompt(prompt),
       });
 
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     // Fallback to Chat Completions
     const chat = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-5',
       messages: [
         { role: 'system', content: 'You return ONLY strict JSON. Never include markdown fences.' },
         { role: 'user', content: buildPrompt(prompt) },

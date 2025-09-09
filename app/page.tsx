@@ -3,6 +3,7 @@
 import { useAuth } from "@/components/AuthProvider"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import LoadingSpinner from "@/components/LoadingSpinner"
 import Link from "next/link"
 
 export default function Home() {
@@ -17,8 +18,8 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-black">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner size="lg" text="Loading..." />
       </div>
     )
   }

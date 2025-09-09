@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import AIGenerationModal from "@/components/AIGenerationModal"
+import LoadingSpinner from "@/components/LoadingSpinner"
 
 interface Form {
   id: string
@@ -96,8 +97,8 @@ export default function AdminDashboard() {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-black">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner size="lg" text="Loading dashboard..." />
       </div>
     )
   }
@@ -263,7 +264,7 @@ export default function AdminDashboard() {
             <div className="p-6">
               {isLoadingSubmissions ? (
                 <div className="text-center py-8">
-                  <div className="text-lg text-black">Loading responses...</div>
+                  <LoadingSpinner size="md" text="Loading responses..." />
                 </div>
               ) : submissions.length === 0 ? (
                 <div className="text-center py-8">
