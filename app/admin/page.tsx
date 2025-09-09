@@ -4,6 +4,7 @@ import { useAuth } from "@/components/AuthProvider"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import AIGenerationModal from "@/components/AIGenerationModal"
 
 interface Form {
   id: string
@@ -45,6 +46,7 @@ export default function AdminDashboard() {
   const [selectedForm, setSelectedForm] = useState<Form | null>(null)
   const [submissions, setSubmissions] = useState<FormSubmission[]>([])
   const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(false)
+  const [showAIModal, setShowAIModal] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -88,6 +90,10 @@ export default function AdminDashboard() {
     fetchSubmissions(form.id)
   }
 
+  const handleFormCreated = () => {
+    fetchForms() // Refresh the forms list
+  }
+
   if (loading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -129,23 +135,45 @@ export default function AdminDashboard() {
         <div className="px-4 py-6 sm:px-0">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-black">Your Forms</h2>
-            <Link
-              href="/admin/forms/new"
-              className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
-              Create New Form
-            </Link>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowAIModal(true)}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                <span>Generate with AI</span>
+              </button>
+              <Link
+                href="/admin/forms/new"
+                className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Create New Form
+              </Link>
+            </div>
           </div>
 
           {forms.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-black text-lg">No forms created yet.</p>
-              <Link
-                href="/admin/forms/new"
-                className="mt-4 inline-block bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              >
-                Create your first form
-              </Link>
+              <div className="mt-4 flex justify-center space-x-3">
+                <button
+                  onClick={() => setShowAIModal(true)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  <span>Generate with AI</span>
+                </button>
+                <Link
+                  href="/admin/forms/new"
+                  className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Create your first form
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -219,11 +247,12 @@ export default function AdminDashboard() {
           <div className="relative w-full max-w-4xl shadow-2xl rounded-xl bg-white">
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
               <h3 className="text-xl font-semibold text-black">
-                Responses for "{selectedForm.title}"
+                Responses for &quot;{selectedForm.title}&quot;
               </h3>
               <button
                 onClick={() => setSelectedForm(null)}
                 className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                title="Close modal"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -271,6 +300,13 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* AI Generation Modal */}
+      <AIGenerationModal
+        isOpen={showAIModal}
+        onClose={() => setShowAIModal(false)}
+        onFormCreated={handleFormCreated}
+      />
     </div>
   )
 }

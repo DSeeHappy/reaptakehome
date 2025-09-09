@@ -1,61 +1,78 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth-server"
-import OpenAI from "openai"
+import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
+import { buildPrompt } from '@/lib/aiPrompt';
+import { zAISuggestion } from '@/lib/aiSchema';
 
-export async function POST(request: NextRequest) {
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+export async function POST(req: NextRequest) {
   try {
-    const user = getCurrentUser(request)
-    
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { prompt } = await req.json() as { prompt: string };
+    if (!prompt || typeof prompt !== 'string') {
+      return NextResponse.json({ error: 'Missing prompt' }, { status: 400 });
     }
 
-    const body = await request.json()
-    const { prompt } = body
-
-    if (!prompt) {
-      return NextResponse.json({ error: "Prompt is required" }, { status: 400 })
-    }
-
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
-      return NextResponse.json({ error: "OpenAI API key not configured" }, { status: 500 })
-    }
-
-    const openai = new OpenAI({
-      apiKey: apiKey,
-    })
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: `Generate form structure. Rules: 2 sections max, 3 fields max per section, only "text" or "number" types. Return JSON: {"sections":[{"title":"Title","description":"Desc","fields":[{"label":"Label","type":"text","required":true,"placeholder":"placeholder"}]}]}`
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 500,
-    })
-
-    const content = completion.choices[0]?.message?.content
-    if (!content) {
-      return NextResponse.json({ error: "No response from OpenAI" }, { status: 500 })
-    }
-
+    // Try Responses API first (preferred)
     try {
-      const parsedContent = JSON.parse(content)
-      return NextResponse.json(parsedContent)
-    } catch (parseError) {
-      console.error("Error parsing OpenAI response:", parseError)
-      return NextResponse.json({ error: "Invalid response format from AI" }, { status: 500 })
+      const completion = await openai.responses.create({
+        model: 'gpt-3.5-turbo',
+        input: buildPrompt(prompt),
+      });
+
+      const text = completion.output_text ?? '';
+      
+      if (text) {
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(text);
+        } catch {
+          // Some models may wrap JSON in fences; try to extract
+          const match = text.match(/{[\s\S]*}/);
+          if (!match) throw new Error('No JSON found in response');
+          parsed = JSON.parse(match[0]);
+        }
+
+        const result = zAISuggestion.parse(parsed);
+
+        // Enforce caps just in case
+        result.sections = result.sections.slice(0, 2).map((s: any) => ({
+          ...s,
+          fields: s.fields.slice(0, 3),
+        }));
+
+        return NextResponse.json({ suggestion: result });
+      }
+    } catch (responsesError) {
+      console.log('Responses API failed, trying Chat Completions:', responsesError);
     }
-  } catch (error) {
-    console.error("Error generating form with AI:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+
+    // Fallback to Chat Completions
+    const chat = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You return ONLY strict JSON. Never include markdown fences.' },
+        { role: 'user', content: buildPrompt(prompt) },
+      ],
+      temperature: 0.2,
+    });
+
+    const text = chat.choices[0]?.message?.content ?? '';
+    if (!text) return NextResponse.json({ error: 'No content' }, { status: 502 });
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      const match = text.match(/{[\s\S]*}/);
+      if (!match) return NextResponse.json({ error: 'Invalid JSON from model' }, { status: 502 });
+      parsed = JSON.parse(match[0]);
+    }
+
+    const result = zAISuggestion.parse(parsed);
+    result.sections = result.sections.slice(0, 2).map((s: any) => ({ ...s, fields: s.fields.slice(0, 3) }));
+    return NextResponse.json({ suggestion: result });
+  } catch (err: unknown) {
+    console.error('AI generation error:', err);
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'AI error' }, { status: 500 });
   }
 }
