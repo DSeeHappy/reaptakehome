@@ -37,17 +37,13 @@ export default function PublicForm() {
 
   const fetchForm = useCallback(async () => {
     try {
-      console.log("Fetching form with publicId:", publicId)
       const response = await fetch(`/api/forms/public/${publicId}`)
       if (response.ok) {
         const data = await response.json()
-        console.log("Form data received:", data)
         setForm(data)
-      } else {
-        console.error("Form not found, status:", response.status)
       }
     } catch (error) {
-      console.error("Error fetching form:", error)
+      // Handle error silently
     } finally {
       setIsLoading(false)
     }
@@ -109,11 +105,9 @@ export default function PublicForm() {
 
       if (response.ok) {
         setIsSubmitted(true)
-      } else {
-        console.error("Error submitting form")
       }
     } catch (error) {
-      console.error("Error submitting form:", error)
+      // Handle error silently
     } finally {
       setIsSubmitting(false)
     }
@@ -156,7 +150,7 @@ export default function PublicForm() {
             <div className="flex space-x-4 justify-center">
               <button
                 onClick={() => window.location.reload()}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg font-medium transition-colors"
               >
                 Submit Another Response
               </button>
@@ -178,10 +172,10 @@ export default function PublicForm() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow-xl rounded-lg overflow-hidden">
           {/* Form Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-8">
+          <div className="bg-gradient-to-r from-primary to-primary-dark px-6 py-8">
             <h1 className="text-3xl font-bold text-white mb-2">{form.title}</h1>
             {form.description && (
-              <p className="text-blue-100 text-lg">{form.description}</p>
+              <p className="text-white/90 text-lg">{form.description}</p>
             )}
           </div>
 
@@ -191,7 +185,7 @@ export default function PublicForm() {
               {form.sections.map((section, sectionIndex) => (
                 <div key={section.id} className="bg-gray-50 rounded-lg p-6">
                   <div className="flex items-center mb-6">
-                    <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">
                       {sectionIndex + 1}
                     </div>
                     <div className="ml-4">
@@ -218,7 +212,7 @@ export default function PublicForm() {
                             id={field.id}
                             required={field.required}
                             placeholder={field.placeholder || ""}
-                            className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black ${
+                            className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-black ${
                               errors[field.id] 
                                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
                                 : 'border-gray-300'
@@ -232,7 +226,7 @@ export default function PublicForm() {
                             id={field.id}
                             required={field.required}
                             placeholder={field.placeholder || ""}
-                            className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black ${
+                            className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition-colors text-black ${
                               errors[field.id] 
                                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
                                 : 'border-gray-300'
@@ -261,7 +255,7 @@ export default function PublicForm() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl disabled:shadow-none"
+                  className="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl disabled:shadow-none"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center justify-center">

@@ -127,7 +127,6 @@ export default function NewForm() {
     
     setIsGenerating(true)
     try {
-      console.log("Sending AI request with prompt:", aiPrompt)
       const response = await fetch("/api/ai/generate-form", {
         method: "POST",
         headers: {
@@ -135,13 +134,10 @@ export default function NewForm() {
         },
         body: JSON.stringify({ prompt: aiPrompt }),
       })
-      
-      console.log("AI response status:", response.status)
 
       if (response.ok) {
         const data = await response.json()
         
-        // Convert AI response to our form structure
         const generatedSections: Section[] = data.sections.map((section: { title: string; description: string; fields: Array<{ label: string; type: string; required: boolean; placeholder: string }> }) => ({
           id: uuidv4(),
           title: section.title,
@@ -160,15 +156,13 @@ export default function NewForm() {
           sections: generatedSections
         }))
         
-        // Clear the prompt
         setAiPrompt("")
       } else {
         const errorData = await response.json()
-        console.error("Error generating form with AI:", errorData)
         alert(`Error: ${errorData.error || 'Failed to generate form'}`)
       }
     } catch (error) {
-      console.error("Error generating form with AI:", error)
+      alert('Error generating form. Please try again.')
     } finally {
       setIsGenerating(false)
     }
@@ -191,11 +185,10 @@ export default function NewForm() {
         router.push("/admin")
       } else {
         const errorData = await response.json()
-        console.error("Error creating form:", errorData.error)
         alert(`Error creating form: ${errorData.error}`)
       }
     } catch (error) {
-      console.error("Error creating form:", error)
+      alert('Error creating form. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -204,7 +197,7 @@ export default function NewForm() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg text-black">Loading...</div>
       </div>
     )
   }
@@ -219,7 +212,7 @@ export default function NewForm() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-black">
                 Create New Form
               </h1>
             </div>
@@ -238,29 +231,29 @@ export default function NewForm() {
       <div className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Form Details</h2>
+            <h2 className="text-lg font-medium text-black mb-4">Form Details</h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="title" className="block text-sm font-medium text-black">
                   Form Title *
                 </label>
                 <input
                   type="text"
                   id="title"
                   required
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm text-black"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 />
               </div>
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="description" className="block text-sm font-medium text-black">
                   Description
                 </label>
                 <textarea
                   id="description"
                   rows={3}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm text-black"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 />
@@ -269,10 +262,10 @@ export default function NewForm() {
           </div>
 
           <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">AI Form Generation</h2>
+            <h2 className="text-lg font-medium text-black mb-4">AI Form Generation</h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="ai-prompt" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="ai-prompt" className="block text-sm font-medium text-black">
                   Describe the form you want to create
                 </label>
                 <div className="mt-1 flex space-x-2">
@@ -280,7 +273,7 @@ export default function NewForm() {
                     type="text"
                     id="ai-prompt"
                     placeholder="e.g., A job application form"
-                    className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm text-black"
                     value={aiPrompt}
                     onChange={(e) => setAiPrompt(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && generateWithAI()}
@@ -289,7 +282,7 @@ export default function NewForm() {
                     type="button"
                     onClick={generateWithAI}
                     disabled={isGenerating || !aiPrompt.trim()}
-                    className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    className="bg-accent hover:bg-accent-dark disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     {isGenerating ? "Generating..." : "Generate with AI"}
                   </button>
@@ -304,7 +297,7 @@ export default function NewForm() {
           {formData.sections.map((section, sectionIndex) => (
             <div key={section.id} className="bg-white shadow rounded-lg p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-medium text-gray-900">
+                <h2 className="text-lg font-medium text-black">
                   Section {sectionIndex + 1}
                 </h2>
                 <button
@@ -318,26 +311,26 @@ export default function NewForm() {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-black">
                     Section Title *
                   </label>
                   <input
                     type="text"
                     required
                     aria-label="Section Title"
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm text-black"
                     value={section.title}
                     onChange={(e) => updateSection(section.id, "title", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-black">
                     Section Description
                   </label>
                   <textarea
                     rows={2}
                     aria-label="Section Description"
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm text-black"
                     value={section.description}
                     onChange={(e) => updateSection(section.id, "description", e.target.value)}
                   />
@@ -346,12 +339,12 @@ export default function NewForm() {
 
               <div className="mt-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-md font-medium text-gray-900">Fields</h3>
+                  <h3 className="text-md font-medium text-black">Fields</h3>
                   <button
                     type="button"
                     onClick={() => addField(section.id)}
                     disabled={section.fields.length >= 3}
-                    className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-3 py-1 rounded text-sm font-medium"
+                    className="bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors"
                   >
                     Add Field ({section.fields.length}/3)
                   </button>
@@ -360,7 +353,7 @@ export default function NewForm() {
                 {section.fields.map((field, fieldIndex) => (
                   <div key={field.id} className="border border-gray-200 rounded-lg p-4 mb-4">
                     <div className="flex justify-between items-center mb-3">
-                      <h4 className="text-sm font-medium text-gray-700">
+                      <h4 className="text-sm font-medium text-black">
                         Field {fieldIndex + 1}
                       </h4>
                       <button
@@ -374,25 +367,25 @@ export default function NewForm() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-black">
                           Field Label *
                         </label>
                         <input
                           type="text"
                           required
                           aria-label="Field Label"
-                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm text-black"
                           value={field.label}
                           onChange={(e) => updateField(section.id, field.id, "label", e.target.value)}
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-black">
                           Field Type
                         </label>
                         <select
                           aria-label="Field Type"
-                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm text-black"
                           value={field.type}
                           onChange={(e) => updateField(section.id, field.id, "type", e.target.value as "text" | "number")}
                         >
@@ -401,13 +394,13 @@ export default function NewForm() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-black">
                           Placeholder
                         </label>
                         <input
                           type="text"
                           aria-label="Field Placeholder"
-                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm text-black"
                           value={field.placeholder}
                           onChange={(e) => updateField(section.id, field.id, "placeholder", e.target.value)}
                         />
@@ -416,11 +409,11 @@ export default function NewForm() {
                         <input
                           type="checkbox"
                           id={`required-${field.id}`}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                           checked={field.required}
                           onChange={(e) => updateField(section.id, field.id, "required", e.target.checked)}
                         />
-                        <label htmlFor={`required-${field.id}`} className="ml-2 block text-sm text-gray-900">
+                        <label htmlFor={`required-${field.id}`} className="ml-2 block text-sm text-black">
                           Required field
                         </label>
                       </div>
@@ -444,7 +437,7 @@ export default function NewForm() {
             <button
               type="submit"
               disabled={isLoading || formData.sections.length === 0}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md text-sm font-medium"
+              className="bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               {isLoading ? "Creating..." : "Create Form"}
             </button>
