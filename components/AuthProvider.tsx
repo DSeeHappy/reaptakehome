@@ -29,8 +29,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    checkAuth()
-  }, [])
+    initializeAndCheckAuth()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const initializeAndCheckAuth = async () => {
+    try {
+      // Initialize the app (ensure admin user exists)
+      await fetch("/api/init")
+      // Then check authentication
+      await checkAuth()
+    } catch (error) {
+      console.error("Initialization error:", error)
+      // Still try to check auth even if init fails
+      await checkAuth()
+    }
+  }
 
   const checkAuth = async () => {
     try {
@@ -64,8 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return true
       }
       return false
-    } catch (error) {
-      console.error("Login error:", error)
+    } catch {
       return false
     }
   }

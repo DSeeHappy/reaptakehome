@@ -4,7 +4,7 @@ A full-stack web application for creating custom forms with AI assistance, built
 
 ## Features
 
-- **Admin Authentication**: Simple login with hardcoded credentials (admin / password123)
+- **Admin Authentication**: Simple login with hardcoded credentials (admin@example.com / password123)
 - **Form Creation**: Create forms with up to 2 sections and 3 fields per section
 - **Field Types**: Support for text and number input fields
 - **AI Integration**: Generate form structure using OpenAI's GPT-5
@@ -25,10 +25,35 @@ A full-stack web application for creating custom forms with AI assistance, built
 
 This project requires Node.js 18+, npm, and an OpenAI API key. The application uses SQLite for data storage and includes a Prisma schema for database management.
 
+### Quick Start - WITHOUT THIS YOU WILL NOT HAVE THE ADMIN@EXAMPLE.COM user this is REQUIRED!
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Run setup script:**
+   ```bash
+   npm run setup
+   ```
+
+3. **Add your OpenAI API key:**
+   - Edit `.env.local` and add your OpenAI API key
+   - Get your key from: https://platform.openai.com/api-keys
+
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Login with:**
+   - Email: `admin@example.com`
+   - Password: `password123`
+
 ## Features
 
 ### Admin Dashboard
-- Login with hardcoded credentials (admin / password123)
+- Login with hardcoded credentials (admin@example.com / password123)
 - Create forms with up to 2 sections and 3 fields per section
 - AI-powered form generation using natural language prompts
 - View all created forms with public submission links

@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ensureAdminUser } from "@/lib/init-db"
 
 export async function GET(request: NextRequest) {
   try {
-    //  fix: Get admin user directly
-    const adminUser = await prisma.user.findUnique({
-      where: { email: "admin@example.com" }
-    })
-
-    if (!adminUser) {
-      return NextResponse.json({ error: "Admin user not found" }, { status: 404 })
-    }
+    // Ensure admin user exists
+    const adminUser = await ensureAdminUser()
 
     const forms = await prisma.form.findMany({
       where: {
@@ -51,20 +46,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // replace with real auth if real project  
-    //  fix: Get or create admin user directly
-    let adminUser = await prisma.user.findUnique({
-      where: { email: "admin@example.com" }
-    })
-
-    if (!adminUser) {
-      adminUser = await prisma.user.create({
-        data: {
-          email: "admin@example.com",
-          name: "Admin User"
-        }
-      })
-    }
+    // Ensure admin user exists
+    const adminUser = await ensureAdminUser()
 
     const body = await request.json()
     const { title, description, sections } = body

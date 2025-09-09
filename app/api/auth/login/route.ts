@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
-import { prisma } from "@/lib/prisma"
+import { ensureAdminUser } from "@/lib/init-db"
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production-12345'
 
@@ -9,22 +9,8 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json()
 
     if (email === "admin@example.com" && password === "password123") {
-      // Find or create admin user
-      let user = await prisma.user.findUnique({
-        where: { email: "admin@example.com" }
-      })
-
-      if (!user) {
-        user = await prisma.user.create({
-          data: {
-            email: "admin@example.com",
-            name: "Admin User"
-          }
-        })
-        console.log("Created admin user with ID:", user.id)
-      } else {
-        console.log("Found existing admin user with ID:", user.id)
-      }
+      // Ensure admin user exists
+      const user = await ensureAdminUser()
 
       const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' })
       
