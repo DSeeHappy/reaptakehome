@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
 :root {
+  /* Brand Colors */
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #60a5fa;
+  --secondary: #10b981;
+  --secondary-dark: #059669;
+  --accent: #f59e0b;
+  --accent-dark: #d97706;
+  
+  /* Neutral Colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111827;
+  --muted: #f9fafb;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+  --border-light: #f3f4f6;
+  
+  /* Status Colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
 }
 
 @theme inline {
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-secondary: var(--secondary);
+  --color-secondary-dark: var(--secondary-dark);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --border: #334155;
+    --border-light: #475569;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
 }
+
+/* Custom utility classes */
+.bg-primary { background-color: var(--primary); }
+.bg-primary-dark { background-color: var(--primary-dark); }
+.bg-primary-light { background-color: var(--primary-light); }
+.bg-secondary { background-color: var(--secondary); }
+.bg-secondary-dark { background-color: var(--secondary-dark); }
+.bg-accent { background-color: var(--accent); }
+.bg-accent-dark { background-color: var(--accent-dark); }
+
+.text-primary { color: var(--primary); }
+.text-primary-dark { color: var(--primary-dark); }
+.text-secondary { color: var(--secondary); }
+.text-secondary-dark { color: var(--secondary-dark); }
+.text-accent { color: var(--accent); }
+.text-accent-dark { color: var(--accent-dark); }
+
+.border-primary { border-color: var(--primary); }
+.border-secondary { border-color: var(--secondary); }
+.border-accent { border-color: var(--accent); }
+
+/* Hover states */
+.hover\:bg-primary-dark:hover { background-color: var(--primary-dark); }
+.hover\:bg-secondary-dark:hover { background-color: var(--secondary-dark); }
+.hover\:bg-accent-dark:hover { background-color: var(--accent-dark); }
+
+/* Focus states */
+.focus\:ring-primary:focus { --tw-ring-color: var(--primary); }
+.focus\:border-primary:focus { border-color: var(--primary); }
