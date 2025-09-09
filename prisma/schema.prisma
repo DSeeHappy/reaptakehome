@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  forms         Form[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Form {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  publicId    String    @unique @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sections    Section[]
+  submissions FormSubmission[]
+}
+
+model Section {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  order       Int
+  formId      String
+  form        Form    @relation(fields: [formId], references: [id], onDelete: Cascade)
+  fields      Field[]
+}
+
+model Field {
+  id          String  @id @default(cuid())
+  label       String
+  type        String  // 'text' or 'number'
+  required    Boolean @default(false)
+  placeholder String?
+  order       Int
+  sectionId   String
+  section     Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  responses   FieldResponse[]
+}
+
+model FormSubmission {
+  id        String        @id @default(cuid())
+  formId    String
+  form      Form          @relation(fields: [formId], references: [id], onDelete: Cascade)
+  submittedAt DateTime    @default(now())
+  responses FieldResponse[]
+}
+
+model FieldResponse {
+  id           String         @id @default(cuid())
+  value        String
+  fieldId      String
+  field        Field          @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  submissionId String
+  submission   FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+}
