@@ -190,7 +190,9 @@ export default function NewForm() {
       if (response.ok) {
         router.push("/admin")
       } else {
-        console.error("Error creating form")
+        const errorData = await response.json()
+        console.error("Error creating form:", errorData.error)
+        alert(`Error creating form: ${errorData.error}`)
       }
     } catch (error) {
       console.error("Error creating form:", error)

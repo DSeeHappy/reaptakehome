@@ -21,6 +21,9 @@ export async function POST(request: NextRequest) {
             name: "Admin User"
           }
         })
+        console.log("Created admin user with ID:", user.id)
+      } else {
+        console.log("Found existing admin user with ID:", user.id)
       }
 
       const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' })
